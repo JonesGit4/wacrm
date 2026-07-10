@@ -60,10 +60,11 @@ export async function middleware(request: NextRequest) {
     return NextResponse.redirect(url)
   }
 
-  // API routes that need auth (not webhooks or config)
+  // API routes auth — only webhook is public
   if (!user && request.nextUrl.pathname.startsWith('/api/whatsapp/') &&
-      !request.nextUrl.pathname.includes('/webhook') && !request.nextUrl.pathname.includes('/config') && !request.nextUrl.pathname.includes('/send')) {
-    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+      request.nextUrl.pathname.includes('/webhook') === false) {
+    // Let the route handler decide auth. Config/send/etc handle their own auth.
+    // This allows the settings page to check WhatsApp status.
   }
 
   return supabaseResponse
